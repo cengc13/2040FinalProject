@@ -1,8 +1,6 @@
 *.ipynb_checkpoints/
 *.tar.gz
-*.parquet
 *.csv
-*.tff
 *.zip
 *.h5
 *.pkl
