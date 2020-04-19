@@ -1,6 +1,7 @@
 """Helper functions for code sanity"""
 import numpy as np
 from tensorflow.keras.callbacks import Callback
+from sklearn.metrics import accuracy_score, roc_auc_score
 
 def regular_encode(texts, tokenizer, maxlen=512):
     """
