@@ -1,7 +1,8 @@
 *.ipynb_checkpoints/
+__pycache__
 *.tar.gz
 *.csv
 *.zip
 *.h5
 *.pkl
-__pycache__
+*.json
