@@ -1,6 +1,6 @@
 # DATA 2040 Final Project: [Kaggle competition] Jigsaw Multilingual Toxic Comment Classification # 
 
-It only takes one toxic comment to sour an online discussion. A main area of focus is machine learning models to identify toxicity in online conversations, where toxicity is defined as anything *rude*, *disrespectful* or otherwise likely to make someone leave a conversation. This project is taking advantage of Kaggles's new TPU support, and it aims to build a multilingual models with English-only training data. More details of this project can be found at [Jigsaw Multilingual](https://www.kaggle.com/c/jigsaw-multilingual-toxic-comment-classification).
+This project is taking advantage of Kaggles's new TPU support, and it aims to build a multilingual models with English-only training data. More details of this project can be found at [Jigsaw Multilingual](https://www.kaggle.com/c/jigsaw-multilingual-toxic-comment-classification).
 
 ## Packages
 
