@@ -3,6 +3,7 @@ import numpy as np
 from tensorflow.keras.callbacks import Callback
 from sklearn.metrics import accuracy_score, roc_auc_score
 import re
+from tqdm.notebook import tqdm
 
 def regular_encode(texts, tokenizer, maxlen=512):
     """
