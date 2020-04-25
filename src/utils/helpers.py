@@ -21,7 +21,7 @@ def regular_encode(texts, tokenizer, maxlen=512):
     return np.array(enc_di['input_ids'])
 
 def fast_encode(texts, tokenizer, chunk_size=256, maxlen=512):
-    """
+    """3
     https://www.kaggle.com/xhlulu/jigsaw-tpu-distilbert-with-huggingface-and-keras
     """
     tokenizer.enable_truncation(max_length=maxlen)
@@ -178,7 +178,8 @@ mispell_dict = {"aren't" : "are not",
 "tryin'":"trying"}
 
 def clean_text(x):
-    x = str(x).replace("\n","")
+    x = str(x).replace("\n"," ")
+    x = ' '.join(x.split())
     for punct in puncts:
         x = x.replace(punct, f' {punct} ')
     return x
