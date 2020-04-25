@@ -1,6 +1,9 @@
 # DATA 2040 Final Project: [Kaggle competition] Jigsaw Multilingual Toxic Comment Classification # 
 
-This project is taking advantage of Kaggles's new TPU support, and it aims to build a multilingual models with English-only training data. More details of this project can be found at [Jigsaw Multilingual](https://www.kaggle.com/c/jigsaw-multilingual-toxic-comment-classification).
+
+This project is taking advantage of Kaggles's new TPU support, and it aims to build multilingual models with English-only training data. More details of this project can be found at [Jigsaw Multilingual](https://www.kaggle.com/c/jigsaw-multilingual-toxic-comment-classification).
+
+Updates of this final project can also be found in those [final project blogs](https://cengc13.github.io/) 
 
 ## Packages
 
