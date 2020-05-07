@@ -22,7 +22,7 @@ def regular_encode(texts, tokenizer, maxlen=512):
     return np.array(enc_di['input_ids'])
 
 def fast_encode(texts, tokenizer, chunk_size=256, maxlen=512):
-    """3
+    """
     https://www.kaggle.com/xhlulu/jigsaw-tpu-distilbert-with-huggingface-and-keras
     """
     tokenizer.enable_truncation(max_length=maxlen)
