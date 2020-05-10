@@ -77,10 +77,9 @@ class RocAucEvaluation(Callback):
             print("\n ROC-AUC - epoch: {:d} - score: {:.6f}".format(epoch+1, score))
             
 
-def build_lrfn(strategy, lr_start=0.000001, lr_max=0.000002, 
+def build_lrfn(lr_start=0.000001, lr_max=0.000016, 
                lr_min=0.0000001, lr_rampup_epochs=7, 
                lr_sustain_epochs=0, lr_exp_decay=.87):
-    lr_max = lr_max * strategy.num_replicas_in_sync
 
     def lrfn(epoch):
         if epoch < lr_rampup_epochs:
@@ -95,22 +94,48 @@ def build_lrfn(strategy, lr_start=0.000001, lr_max=0.000002,
 
     
 ##### Text cleaning
+from nltk import sent_tokenize
+LANGS = {
+    'en': 'english',
+    'it': 'italian', 
+    'fr': 'french', 
+    'es': 'spanish',
+    'tr': 'turkish', 
+    'ru': 'russian',
+    'pt': 'portuguese'
+}
+
+def get_sentences(text, lang='en'):
+    return sent_tokenize(text, LANGS.get(lang, 'english'))
+
+def exclude_duplicate_sentences(text, lang='en'):
+    sentences = []
+    for sentence in get_sentences(text, lang):
+        sentence = sentence.strip()
+        if sentence not in sentences:
+            sentences.append(sentence)
+    return ' '.join(sentences)
+
 def clean(text):
-    text = text.fillna("fillna").str.lower()
-    text = text.map(lambda x: re.sub('\\n',' ',str(x)))
-    text = text.map(lambda x: re.sub("\[\[User.*",'',str(x)))
-    text = text.map(lambda x: re.sub("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}",'',str(x)))
-    text = text.map(lambda x: re.sub("\(http://.*?\s\(http://.*\)",'',str(x)))
+    text = text.lower()
+    text = exclude_duplicate_sentences(text, lang='en')
+    text = re.sub('\\n',' ', text)
+    text = re.sub("\[\[User.*",'',text)
+    text = re.sub("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}",'',text)
+    text = re.sub("\(http://.*?\s\(http://.*\)",'',text)
     return text
+
+
 
 # https://www.kaggle.com/chenshengabc/from-quest-encoding-ensemble-a-little-bit-differen
 
-puncts = [',', '.', '"', ':', ')', '(', '-', '!', '?', '|', ';', "'", '$', '&', '/', '[', ']', '>', '%', '=', '#', '*', '+', '\\', '•',  '~', '@', '£',
+puncts = [')', '(', '-',  '|',  '$', '&', '/', '[', ']', '>', '%', '=', '#', '*', '+', '\\', '•',  '~', '@', '£',
  '·', '_', '{', '}', '©', '^', '®', '`',  '<', '→', '°', '€', '™', '›',  '♥', '←', '×', '§', '″', '′', 'Â', '█', '½', 'à', '…', '\xa0', '\t',
  '“', '★', '”', '–', '●', 'â', '►', '−', '¢', '²', '¬', '░', '¶', '↑', '±', '¿', '▾', '═', '¦', '║', '―', '¥', '▓', '—', '‹', '─', '\u3000', '\u202f',
  '▒', '：', '¼', '⊕', '▼', '▪', '†', '■', '’', '▀', '¨', '▄', '♫', '☆', 'é', '¯', '♦', '¤', '▲', 'è', '¸', '¾', 'Ã', '⋅', '‘', '∞', '«',
  '∙', '）', '↓', '、', '│', '（', '»', '，', '♪', '╩', '╚', '³', '・', '╦', '╣', '╔', '╗', '▬', '❤', 'ï', 'Ø', '¹', '≤', '‡', '√', ]
- 
+special_puncts = [',', '.', '"', ':', '!', '?', ';', "'",]
+
 mispell_dict = {"aren't" : "are not",
 "can't" : "cannot",
 "couldn't" : "could not",
@@ -180,34 +205,13 @@ mispell_dict = {"aren't" : "are not",
 
 def clean_text(x):
     x = str(x).replace("\n"," ")
-    x = ' '.join(x.split())
     for punct in puncts:
-        x = x.replace(punct, f' {punct} ')
+        x = x.replace(punct, ' ')
     return x
-
-
-def clean_numbers(x):
-    x = re.sub('[0-9]{5,}', '#####', x)
-    x = re.sub('[0-9]{4}', '####', x)
-    x = re.sub('[0-9]{3}', '###', x)
-    x = re.sub('[0-9]{2}', '##', x)
-    return x
-
 
 ### clean text from the kernel:
 ### https://www.kaggle.com/mobassir/understanding-cross-lingual-models#Part-2-:-Implementation-using-TPU-Multiprocessing
 from nltk.tokenize.treebank import TreebankWordTokenizer
-
-
-def handle_contractions(x):
-    tokenizer = TreebankWordTokenizer()
-    x = tokenizer.tokenize(x)
-    return x
-
-def fix_quote(x):
-    x = [x_[1:] if x_.startswith("'") else x_ for x_ in x]
-    x = ' '.join(x)
-    return x
 
 def _get_mispell(mispell_dict):
     mispell_re = re.compile('(%s)' % '|'.join(mispell_dict.keys()))
@@ -225,12 +229,9 @@ def replace_typical_misspell(text):
 
 def clean_data(df, columns: list):
     for col in columns:
-#         df[col] = df[col].apply(lambda x: clean_numbers(x))
-        df[col] = df[col].apply(lambda x: clean_text(x.lower())) 
-        df[col] = df[col].apply(lambda x: replace_typical_misspell(x))
-        df[col] = df[col].apply(lambda x: handle_contractions(x))  
-        df[col] = df[col].apply(lambda x: fix_quote(x))   
-    
+        df[col] = df[col].apply(lambda x: clean(x))
+        df[col] = df[col].apply(lambda x: clean_text(x)) 
+        df[col] = df[col].apply(lambda x: replace_typical_misspell(x))  
     return df
 
 def plot_loss(his, epoch, title):
