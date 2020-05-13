@@ -6,4 +6,3 @@ __pycache__
 *.h5
 *.pkl
 *.json
-*.ipynb
