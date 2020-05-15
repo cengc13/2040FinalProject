@@ -118,7 +118,7 @@ def exclude_duplicate_sentences(text, lang='en'):
 
 def clean(text):
     text = text.lower()
-    text = exclude_duplicate_sentences(text, lang='en')
+    # text = exclude_duplicate_sentences(text, lang='en')
     text = re.sub('\\n',' ', text)
     text = re.sub("\[\[User.*",'',text)
     text = re.sub("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}",'',text)
